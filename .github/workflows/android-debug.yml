@@ -10,31 +10,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
+    - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Set up Node.js
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: 18
 
-    - name: Install Cordova
+    - name: Install Cordova CLI
       run: npm install -g cordova
 
-    - name: Set up Java
+    - name: Setup Java 17
       uses: actions/setup-java@v4
       with:
         distribution: temurin
         java-version: 17
 
-    - name: Install Android SDK
+    - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Install Android SDK packages
+    - name: Install Android SDK packages (REQUIRED by cordova-android 11)
       run: |
-        sdkmanager "platforms;android-33" "build-tools;33.0.2"
+        sdkmanager "platforms;android-32" "build-tools;32.0.0"
 
-    # 🔑 THIS IS THE FIX
     - name: Install compatible Gradle (7.6)
       run: |
         wget https://services.gradle.org/distributions/gradle-7.6-bin.zip
@@ -42,7 +41,7 @@ jobs:
         sudo mv gradle-7.6 /opt/gradle
         echo "/opt/gradle/bin" >> $GITHUB_PATH
 
-    - name: Verify Gradle version
+    - name: Verify Gradle
       run: gradle --version
 
     - name: Add Android platform (cordova-android 11)
@@ -53,7 +52,7 @@ jobs:
     - name: Build Debug APK
       run: cordova build android --debug
 
-    - name: Upload APK
+    - name: Upload Debug APK
       uses: actions/upload-artifact@v4
       with:
         name: debug-apk
