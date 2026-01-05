@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cute Calculator</title>
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ff6fae">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- STARTUP -->
+<div id="startup">
+  <div class="glass">
+    <div class="emoji">🎀</div>
+    <div class="title">Cute Calculator</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+  <h1>🎀 Select Your Birth Date</h1>
+
+  <div class="wheel-wrap">
+    <div class="wheel" id="day"></div>
+    <div class="wheel" id="month"></div>
+    <div class="wheel" id="year"></div>
+    <div class="highlight"></div>
+  </div>
+
+  <div id="result" class="result">Scroll to choose ✨</div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
