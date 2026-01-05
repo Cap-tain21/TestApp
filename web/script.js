@@ -5,6 +5,7 @@ const result = document.getElementById("result");
 
 const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 let last = { day:null, month:null, year:null };
+let ticking = false;
 
 function spacer() {
   const d = document.createElement("div");
@@ -32,21 +33,22 @@ fill(year, Array.from({length:77},(_,i)=>2026-i));
 function getActive(el, key) {
   const center = el.scrollTop + 100;
   let active;
-  el.querySelectorAll(".item").forEach(i => {
-    i.classList.remove("active");
-    if (!i.classList.contains("spacer") &&
-        Math.abs(i.offsetTop + 20 - center) < 18) {
-      active = i;
+
+  const items = el.children;
+  for (let i=0;i<items.length;i++) {
+    const it = items[i];
+    it.classList.remove("active");
+    if (!it.classList.contains("spacer") &&
+        Math.abs(it.offsetTop + 20 - center) < 18) {
+      active = it;
     }
-  });
+  }
   if (active) {
     active.classList.add("active");
     last[key] = active.textContent;
   }
-  return active?.textContent;
 }
 
-/* DATE INTELLIGENCE */
 function daysInMonth(y, m) {
   return new Date(y, m + 1, 0).getDate();
 }
@@ -59,28 +61,9 @@ function enforceValidDate() {
 
   const max = daysInMonth(y, m);
   if (d > max) {
-    const target = (max + 2) * 40;
-    day.scrollTo({ top: target, behavior: "smooth" });
+    day.scrollTo({ top: (max + 2) * 40, behavior: "smooth" });
     last.day = max;
   }
-}
-
-function snap(el) {
-  el.scrollTo({
-    top: Math.round(el.scrollTop / 40) * 40,
-    behavior: "smooth"
-  });
-}
-
-let snapTimer;
-function onScroll(el, key) {
-  return () => {
-    getActive(el, key);
-    enforceValidDate();
-    clearTimeout(snapTimer);
-    snapTimer = setTimeout(() => snap(el), 90);
-    calcAge();
-  };
 }
 
 function calcAge() {
@@ -108,9 +91,25 @@ function calcAge() {
   result.innerHTML = `🎉 <b>${Y}</b> years • <b>${M}</b> months • <b>${D}</b> days`;
 }
 
-day.addEventListener("scroll", onScroll(day,"day"));
-month.addEventListener("scroll", onScroll(month,"month"));
-year.addEventListener("scroll", onScroll(year,"year"));
+function update() {
+  ticking = false;
+  getActive(day,"day");
+  getActive(month,"month");
+  getActive(year,"year");
+  enforceValidDate();
+  calcAge();
+}
+
+function onScroll() {
+  if (!ticking) {
+    requestAnimationFrame(update);
+    ticking = true;
+  }
+}
+
+day.addEventListener("scroll", onScroll, { passive:true });
+month.addEventListener("scroll", onScroll, { passive:true });
+year.addEventListener("scroll", onScroll, { passive:true });
 
 window.addEventListener("load", () => {
   setTimeout(() => {
