@@ -30,9 +30,20 @@ jobs:
     - name: Install Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Install Android build tools
+    - name: Install Android SDK packages
       run: |
         sdkmanager "platforms;android-33" "build-tools;33.0.2"
+
+    # 🔑 THIS IS THE FIX
+    - name: Install compatible Gradle (7.6)
+      run: |
+        wget https://services.gradle.org/distributions/gradle-7.6-bin.zip
+        unzip gradle-7.6-bin.zip
+        sudo mv gradle-7.6 /opt/gradle
+        echo "/opt/gradle/bin" >> $GITHUB_PATH
+
+    - name: Verify Gradle version
+      run: gradle --version
 
     - name: Add Android platform (cordova-android 11)
       run: |
@@ -40,8 +51,7 @@ jobs:
         cordova platform add android@11.0.0
 
     - name: Build Debug APK
-      run: |
-        cordova build android --debug
+      run: cordova build android --debug
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
